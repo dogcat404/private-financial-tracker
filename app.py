@@ -7,97 +7,103 @@ from supabase import create_client, Client
 
 st.set_page_config(page_title="Arthur's Private Financial Tracker", page_icon="🌿", layout="wide")
 
-GREEN = "#176B45"
-LIGHT_GREEN = "#E8F5EC"
-DARK = "#173B2D"
+# Read the active Streamlit theme so our small compatibility CSS follows the
+# user's choice in ⋮ > Settings > Theme.
+try:
+    ACTIVE_THEME = st.context.theme.type
+except Exception:
+    ACTIVE_THEME = "light"
+
+if ACTIVE_THEME == "dark":
+    GREEN = "#36A66E"
+    DARK = "#E8F5EC"
+    APP_BG = "#0C1711"
+    SIDEBAR_BG = "#13241A"
+    SURFACE = "#17291E"
+    TEXT = "#E8F5EC"
+    MUTED = "#ADC5B5"
+    BORDER = "#34513E"
+    INPUT_BG = "#101F16"
+    PLACEHOLDER = "#9BB4A3"
+    BUTTON_BG = "#20764B"
+    BUTTON_HOVER = "#2A8C5B"
+    COLOR_SCHEME = "dark"
+else:
+    GREEN = "#176B45"
+    DARK = "#173B2D"
+    APP_BG = "#F7FBF8"
+    SIDEBAR_BG = "#EAF5EE"
+    SURFACE = "#FFFFFF"
+    TEXT = "#173B2D"
+    MUTED = "#527263"
+    BORDER = "#D7E9DC"
+    INPUT_BG = "#FFFFFF"
+    PLACEHOLDER = "#71877B"
+    BUTTON_BG = "#176B45"
+    BUTTON_HOVER = "#0F5132"
+    COLOR_SCHEME = "light"
 
 st.markdown(f"""
 <style>
-/* Force consistent light colors even if the browser/Streamlit theme is dark. */
-:root {{ color-scheme: light; }}
+/* Theme-aware contrast fixes. Streamlit's native theme selector chooses the palette. */
+:root {{ color-scheme: {COLOR_SCHEME}; }}
 html, body, .stApp, [data-testid="stAppViewContainer"] {{
-    background-color: #F7FBF8 !important;
-    color: {DARK} !important;
+    background-color: {APP_BG} !important;
+    color: {TEXT} !important;
 }}
-[data-testid="stHeader"] {{ background: rgba(247, 251, 248, 0.96) !important; }}
-.main .block-container {{ color: {DARK} !important; padding-top: 2rem; }}
+[data-testid="stHeader"] {{ background: {APP_BG} !important; }}
+.main .block-container {{ color: {TEXT} !important; padding-top: 2rem; }}
 
-/* Global copy and form labels: dark green on the pale background. */
 p, label, .stMarkdown, .stCaption, [data-testid="stCaptionContainer"],
 [data-testid="stWidgetLabel"], [data-testid="stMarkdownContainer"] p,
 [data-testid="stMetricLabel"], [data-testid="stMetricValue"],
-[data-testid="stMetricDelta"] {{ color: {DARK} !important; }}
+[data-testid="stMetricDelta"] {{ color: {TEXT} !important; }}
 h1, h2, h3, h4, h5, h6 {{ color: {GREEN} !important; }}
 
-/* Sidebar must keep readable text, including the navigation options. */
 section[data-testid="stSidebar"], [data-testid="stSidebar"] > div {{
-    background-color: #EAF5EE !important;
+    background-color: {SIDEBAR_BG} !important;
 }}
-[data-testid="stSidebar"], [data-testid="stSidebar"] * {{
-    color: {DARK} !important;
-}}
-[data-testid="stSidebar"] button,
-[data-testid="stSidebar"] button * {{ color: #FFFFFF !important; }}
+[data-testid="stSidebar"], [data-testid="stSidebar"] * {{ color: {TEXT} !important; }}
+[data-testid="stSidebar"] button {{ background: transparent !important; }}
+[data-testid="stSidebar"] button *, [data-testid="stSidebar"] a {{ color: {TEXT} !important; }}
 
-/* White cards and clearly visible metric numbers. */
+/* Cards and forms */
 div[data-testid="stMetric"] {{
-    background: #FFFFFF !important;
-    border: 1px solid #D7E9DC !important;
-    padding: 16px !important;
-    border-radius: 14px !important;
+    background: {SURFACE} !important; border: 1px solid {BORDER} !important;
+    padding: 16px !important; border-radius: 14px !important;
 }}
-div[data-testid="stMetric"] [data-testid="stMetricLabel"] {{
-    color: #527263 !important; opacity: 1 !important;
-}}
-div[data-testid="stMetric"] [data-testid="stMetricValue"] {{
-    color: #173B2D !important; opacity: 1 !important;
-}}
+div[data-testid="stMetric"] [data-testid="stMetricLabel"] {{ color: {MUTED} !important; opacity: 1 !important; }}
+div[data-testid="stMetric"] [data-testid="stMetricValue"] {{ color: {TEXT} !important; opacity: 1 !important; }}
 div[data-testid="stMetric"] [data-testid="stMetricDelta"] {{ opacity: 1 !important; }}
-
-/* Forms, inputs, dropdowns, and dates stay light and legible. */
 div[data-testid="stForm"] {{
-    background: #FFFFFF !important;
-    padding: 16px !important;
-    border: 1px solid #D7E9DC !important;
-    border-radius: 14px !important;
+    background: {SURFACE} !important; padding: 16px !important;
+    border: 1px solid {BORDER} !important; border-radius: 14px !important;
 }}
-.stTextInput input, .stNumberInput input, .stDateInput input,
-.stTextArea textarea {{
-    background: #FFFFFF !important;
-    color: #173B2D !important;
-    -webkit-text-fill-color: #173B2D !important;
-    border: 1px solid #C8DDD0 !important;
+
+.stTextInput input, .stNumberInput input, .stDateInput input, .stTextArea textarea {{
+    background: {INPUT_BG} !important; color: {TEXT} !important;
+    -webkit-text-fill-color: {TEXT} !important; border: 1px solid {BORDER} !important;
     border-radius: 8px !important;
 }}
 [data-baseweb="select"] > div {{
-    background-color: #FFFFFF !important;
-    color: #173B2D !important;
-    border-color: #C8DDD0 !important;
+    background-color: {INPUT_BG} !important; color: {TEXT} !important;
+    border-color: {BORDER} !important;
 }}
-[data-baseweb="select"] *, [role="listbox"], [role="option"] {{
-    color: #173B2D !important;
-}}
-[role="listbox"], [role="option"] {{ background-color: #FFFFFF !important; }}
-.stTextInput input::placeholder {{ color: #71877B !important; -webkit-text-fill-color: #71877B !important; }}
+[data-baseweb="select"] *, [role="listbox"], [role="option"] {{ color: {TEXT} !important; }}
+[role="listbox"], [role="option"] {{ background-color: {SURFACE} !important; }}
+.stTextInput input::placeholder {{ color: {PLACEHOLDER} !important; -webkit-text-fill-color: {PLACEHOLDER} !important; }}
 
-/* Buttons retain the app's green-and-white look. */
+/* Primary actions keep a consistent green accent in both themes. */
 div.stButton > button, div[data-testid="stFormSubmitButton"] > button,
 [data-testid="stDownloadButton"] > button {{
-    background: {GREEN} !important;
-    color: #FFFFFF !important;
-    border: 0 !important;
-    border-radius: 10px !important;
+    background: {BUTTON_BG} !important; color: #FFFFFF !important;
+    border: 0 !important; border-radius: 10px !important;
 }}
 div.stButton > button *, div[data-testid="stFormSubmitButton"] > button *,
 [data-testid="stDownloadButton"] > button * {{ color: #FFFFFF !important; }}
 div.stButton > button:hover, div[data-testid="stFormSubmitButton"] > button:hover,
-[data-testid="stDownloadButton"] > button:hover {{
-    background: #0F5132 !important;
-    color: #FFFFFF !important;
-}}
-
-/* Tables and dataframes use dark text rather than inheriting dark-mode white. */
-[data-testid="stDataFrame"], [data-testid="stTable"] {{ color: #173B2D !important; }}
+[data-testid="stDownloadButton"] > button:hover {{ background: {BUTTON_HOVER} !important; color: #FFFFFF !important; }}
+[data-testid="stDataFrame"], [data-testid="stTable"] {{ color: {TEXT} !important; }}
 </style>
 """, unsafe_allow_html=True)
 
