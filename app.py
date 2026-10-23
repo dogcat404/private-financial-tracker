@@ -13,13 +13,91 @@ DARK = "#173B2D"
 
 st.markdown(f"""
 <style>
-.stApp {{ background: #F7FBF8; color: {DARK}; }}
-[data-testid="stSidebar"] {{ background: #EAF5EE; }}
-h1, h2, h3 {{ color: {GREEN}; }}
-div.stButton > button {{ background: {GREEN}; color: white; border: 0; border-radius: 10px; }}
-div.stButton > button:hover {{ background: #0F5132; color: white; }}
-div[data-testid="stMetric"] {{ background: white; border: 1px solid #D7E9DC; padding: 16px; border-radius: 14px; }}
-div[data-testid="stForm"] {{ background: white; padding: 16px; border: 1px solid #D7E9DC; border-radius: 14px; }}
+/* Force consistent light colors even if the browser/Streamlit theme is dark. */
+:root {{ color-scheme: light; }}
+html, body, .stApp, [data-testid="stAppViewContainer"] {{
+    background-color: #F7FBF8 !important;
+    color: {DARK} !important;
+}}
+[data-testid="stHeader"] {{ background: rgba(247, 251, 248, 0.96) !important; }}
+.main .block-container {{ color: {DARK} !important; padding-top: 2rem; }}
+
+/* Global copy and form labels: dark green on the pale background. */
+p, label, .stMarkdown, .stCaption, [data-testid="stCaptionContainer"],
+[data-testid="stWidgetLabel"], [data-testid="stMarkdownContainer"] p,
+[data-testid="stMetricLabel"], [data-testid="stMetricValue"],
+[data-testid="stMetricDelta"] {{ color: {DARK} !important; }}
+h1, h2, h3, h4, h5, h6 {{ color: {GREEN} !important; }}
+
+/* Sidebar must keep readable text, including the navigation options. */
+section[data-testid="stSidebar"], [data-testid="stSidebar"] > div {{
+    background-color: #EAF5EE !important;
+}}
+[data-testid="stSidebar"], [data-testid="stSidebar"] * {{
+    color: {DARK} !important;
+}}
+[data-testid="stSidebar"] button,
+[data-testid="stSidebar"] button * {{ color: #FFFFFF !important; }}
+
+/* White cards and clearly visible metric numbers. */
+div[data-testid="stMetric"] {{
+    background: #FFFFFF !important;
+    border: 1px solid #D7E9DC !important;
+    padding: 16px !important;
+    border-radius: 14px !important;
+}}
+div[data-testid="stMetric"] [data-testid="stMetricLabel"] {{
+    color: #527263 !important; opacity: 1 !important;
+}}
+div[data-testid="stMetric"] [data-testid="stMetricValue"] {{
+    color: #173B2D !important; opacity: 1 !important;
+}}
+div[data-testid="stMetric"] [data-testid="stMetricDelta"] {{ opacity: 1 !important; }}
+
+/* Forms, inputs, dropdowns, and dates stay light and legible. */
+div[data-testid="stForm"] {{
+    background: #FFFFFF !important;
+    padding: 16px !important;
+    border: 1px solid #D7E9DC !important;
+    border-radius: 14px !important;
+}}
+.stTextInput input, .stNumberInput input, .stDateInput input,
+.stTextArea textarea {{
+    background: #FFFFFF !important;
+    color: #173B2D !important;
+    -webkit-text-fill-color: #173B2D !important;
+    border: 1px solid #C8DDD0 !important;
+    border-radius: 8px !important;
+}}
+[data-baseweb="select"] > div {{
+    background-color: #FFFFFF !important;
+    color: #173B2D !important;
+    border-color: #C8DDD0 !important;
+}}
+[data-baseweb="select"] *, [role="listbox"], [role="option"] {{
+    color: #173B2D !important;
+}}
+[role="listbox"], [role="option"] {{ background-color: #FFFFFF !important; }}
+.stTextInput input::placeholder {{ color: #71877B !important; -webkit-text-fill-color: #71877B !important; }}
+
+/* Buttons retain the app's green-and-white look. */
+div.stButton > button, div[data-testid="stFormSubmitButton"] > button,
+[data-testid="stDownloadButton"] > button {{
+    background: {GREEN} !important;
+    color: #FFFFFF !important;
+    border: 0 !important;
+    border-radius: 10px !important;
+}}
+div.stButton > button *, div[data-testid="stFormSubmitButton"] > button *,
+[data-testid="stDownloadButton"] > button * {{ color: #FFFFFF !important; }}
+div.stButton > button:hover, div[data-testid="stFormSubmitButton"] > button:hover,
+[data-testid="stDownloadButton"] > button:hover {{
+    background: #0F5132 !important;
+    color: #FFFFFF !important;
+}}
+
+/* Tables and dataframes use dark text rather than inheriting dark-mode white. */
+[data-testid="stDataFrame"], [data-testid="stTable"] {{ color: #173B2D !important; }}
 </style>
 """, unsafe_allow_html=True)
 
